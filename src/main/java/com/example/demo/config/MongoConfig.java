@@ -2,6 +2,7 @@ package com.example.demo.config;
 
 import com.example.demo.models.CompanyDTO;
 import com.example.demo.models.PricesDTO;
+import com.mongodb.reactivestreams.client.MongoClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -17,20 +18,15 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 @Slf4j
 @Configuration
-public class MongoAppConfig {
+public class MongoConfig {
 
     private final ReactiveMongoTemplate mongoTemplate;
+    private final MongoClient reactiveMongoClient;
 
     @Autowired
-    public MongoAppConfig(ReactiveMongoTemplate mongoTemplate) {
+    public MongoConfig(MongoClient reactiveMongoClient, ReactiveMongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
-    }
-
-    @Bean
-    public MappingMongoConverter mappingMongoConverter(MongoMappingContext mongoMappingContext) {
-        MappingMongoConverter converter = new MappingMongoConverter(NoOpDbRefResolver.INSTANCE, mongoMappingContext);
-        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        return converter;
+        this.reactiveMongoClient = reactiveMongoClient;
     }
 
     @EventListener(ApplicationReadyEvent.class)
