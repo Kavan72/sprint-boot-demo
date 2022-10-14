@@ -44,20 +44,25 @@ public class PriceController {
     @GetMapping(value = "/{id}", produces = "application/json")
     public Mono<PricesDTO> get(@PathVariable("id") String id) {
         return priceRepository.findById(id)
-                .flatMap( pricesDTO ->
-                        Mono.just(pricesDTO)
-                                .zipWith(companyRepository.findById(pricesDTO.getOwner().getId()),
-                                        (u, p) -> {
-                                            u.setOwner(p);
-                                            return u;
-                                        })
+                .flatMap(pricesDTO ->
+                        Mono.just(pricesDTO).zipWith(companyRepository.findById(pricesDTO.getOwner().getId()),
+                                (u, p) -> {
+                                    u.setOwner(p);
+                                    return u;
+                                })
                 );
-
     }
 
     @GetMapping(produces = "application/json")
     public Flux<PricesDTO> get() {
-        return priceRepository.findAll();
+        return priceRepository.findAll()
+                .flatMap(pricesDTO ->
+                        Mono.just(pricesDTO).zipWith(companyRepository.findById(pricesDTO.getOwner().getId()),
+                                (u, p) -> {
+                                    u.setOwner(p);
+                                    return u;
+                                })
+                );
     }
 
 
