@@ -1,0 +1,31 @@
+version: '3.8'
+
+networks:
+  mongodb-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.39.0/24
+          gateway: 172.16.39.1
+
+services:
+
+  mongo:
+    container_name: mongo
+    hostname: mongo
+    image: mongo:5.0.12-focal
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE:-denios-backend}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME:-deniosuser}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD:-password}
+    volumes:
+      - ./scripts/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+      - mongodb_data:/data/db
+    networks:
+      - mongodb-network
+
+volumes:
+  mongodb_data:
